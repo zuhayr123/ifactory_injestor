@@ -39,6 +39,17 @@ def on_create_device_interface(data):
     # Subscribe to the topic
     mqtt_handler.subscribe(topic, email, device_name)
 
+@sio.on('delete_device_interface')
+def on_create_device_interface(data):
+    print("data received is " + str(data))
+    topic = data.get('data', {}).get('topic', '')
+    email = data.get('data', {}).get('admin', '')
+    device_name = data.get('data', {}).get('device_name', 'default_device')
+    mqtt_handler.unsubscribe(topic)
+    print('Device delete triggered with data as: '+ str(data) + " and topic as " + topic)
+    delete_device_file(email= email, device_name= device_name)
+
+
 def create_folder_and_file(data):
     email = data.get('data', {}).get('admin', '')
     folder_name = email.replace('@', '_')  # Replace '@' with '_'
@@ -60,6 +71,21 @@ def create_folder_and_file(data):
     # Write the entire data to the file
     with open(os.path.join(complete_path, json_filename), 'w') as f:
         json.dump(data.get('data', {}), f, indent=4)
+
+def delete_device_file(email, device_name):
+    # Convert email and device_name to the appropriate file path format
+    folder_name = email.replace('@', '_')
+    json_filename = device_name.replace(' ', '_') + ".json"
+    
+    # Construct the full path to the JSON file
+    file_path = os.path.join('interfaces', folder_name, json_filename)
+    
+    # Check if the file exists, and delete if it does
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"{json_filename} has been deleted.")
+    else:
+        print(f"{json_filename} not found.")
 
 def main():
     try:

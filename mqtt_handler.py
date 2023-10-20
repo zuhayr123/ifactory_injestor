@@ -62,6 +62,9 @@ class MQTTHandler:
         })
         self.client.subscribe(topic)
     
+    def unsubscribe(self, topic):
+        self.client.unsubscribe(topic)
+    
     def initial_subscribe(self):
         print("Initial subscribe was called")
         for root, _, files in os.walk('interfaces'):
