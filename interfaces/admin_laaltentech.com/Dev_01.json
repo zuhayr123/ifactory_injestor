@@ -1,14 +1,14 @@
 {
     "dev_type": "custom",
-    "_id": "6531c5a5b99573e45f4c2dd6",
-    "client_id": "O9smFofQEaza6CbkqbOOFWeFybjL8CNZV45R-f_CXOA",
+    "_id": "6531cbe4b99573e45f4c2df0",
+    "client_id": "U9b-en-s4ONnyniIk_o3WdAnqxRk6EecLr_ExmqmV1A",
     "admin": "admin@laaltentech.com",
-    "client_secret": "jFLmzFeyxtyMEGVojpMAph5MGzxGpKKPh7YJHkif2BU",
-    "topic": "topic/01",
-    "ping_speed": "3",
+    "client_secret": "3u0MStbmgO_uuCqihiIj6pNMkpzgPvEgJOPntE9Y-wk",
+    "topic": "test/01",
+    "ping_speed": "5",
     "device_name": "Dev 01",
-    "timestamp": "1697760677",
-    "interface": "{\"data\": \"test_data\"}",
+    "timestamp": "1697762276",
+    "interface": "{\"data\": \"test\"}",
     "__v": 0,
     "connect_at": "57827"
 }

@@ -13,11 +13,16 @@ class MQTTHandler:
 
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode('utf-8')
-        interface_file_path = f'interfaces/{userdata["email"]}/{userdata["device_name"]}.json'
+        interface_file_path = self.get_interface_file_path(userdata)
+        print("path found was " + interface_file_path + " and payload is " + payload)
 
         if os.path.exists(interface_file_path):
             with open(interface_file_path, 'r') as f:
-                interface = json.load(f)
+                data = json.load(f)
+                interface_str = data["interface"]
+                interface = json.loads(interface_str)  # convert the string representation to a dictionary
+                print("interface data is:", interface)
+                
                 try:
                     parsed_data = json.loads(payload)
                     for key in interface:
@@ -27,6 +32,18 @@ class MQTTHandler:
                     print("Received data is not valid JSON.")
         else:
             print(f"No interface found for {userdata['device_name']}")
+
+    def get_interface_file_path(self, data):
+        email = data.get('email', '')
+        folder_name = email.replace('@', '_')  # Replace '@' with '_'
+        
+        device_name = data.get('device_name', 'default_device')
+        json_filename = device_name.replace(' ', '_') + ".json"  # Replace spaces with '_' and append ".json"
+
+        # Construct the path to the interface file
+        complete_path = os.path.join('interfaces', folder_name, json_filename)
+
+        return complete_path
 
     def connect(self, broker_address, port):
         self.client.connect(broker_address, port)
