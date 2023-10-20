@@ -3,10 +3,16 @@ import paho.mqtt.client as mqtt
 import os
 
 class MQTTHandler:
-    def __init__(self):
+    def __init__(self, broker_address, port):
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
+
+        # Connect to the MQTT broker immediately
+        self.connect(broker_address, port)
+
+        # Subscribe to topics from the existing interfaces
+        self.initial_subscribe()
 
     def on_connect(self, client, userdata, flags, rc):
         print(f"Connected to MQTT with result code {str(rc)}")
@@ -55,3 +61,20 @@ class MQTTHandler:
             "device_name": device_name
         })
         self.client.subscribe(topic)
+    
+    def initial_subscribe(self):
+        print("Initial subscribe was called")
+        for root, _, files in os.walk('interfaces'):
+            for file_name in files:
+                if file_name.endswith('.json'):
+                    file_path = os.path.join(root, file_name)
+                    with open(file_path, 'r') as f:
+                        data = json.load(f)
+                        topic = data.get("topic")
+                        if topic:
+                            # Extract email and device name from file path
+                            _, email_folder, device_name_only = file_path.split(os.sep)
+                            email = email_folder.replace('_', '@')
+                            device_name = device_name_only.rsplit('.', 1)[0].replace('_', ' ')
+                            print("trying to subscribe to  " + topic)
+                            self.subscribe(topic, email, device_name)
