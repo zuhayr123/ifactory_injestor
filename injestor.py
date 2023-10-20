@@ -6,8 +6,10 @@
 import socketio
 import os
 import json
+from mqtt_handler import MQTTHandler
 
 sio = socketio.Client()
+mqtt_handler = MQTTHandler()
 
 @sio.on('connect')
 def on_connect():
@@ -21,6 +23,21 @@ def on_disconnect():
 def on_create_device_interface(data):
     print('Message received for "create_device_interface":', data)
     create_folder_and_file(data=data)
+    # Assuming you also receive broker_address in the data
+    broker_address = "127.0.0.1"
+    port = data.get('data', {}).get('connect_at')
+    topic = data.get('data', {}).get('topic', '')
+    email = data.get('data', {}).get('admin', '')
+    device_name = data.get('data', {}).get('device_name', 'default_device')
+
+    print("data found on broker address " + broker_address + "port is " + port + " topic is " + topic + " email id is " + email + " device name is " + device_name)
+
+    # Connect to the broker if not already connected
+    if not mqtt_handler.client.is_connected():
+        mqtt_handler.connect(broker_address, int(1883))
+
+    # Subscribe to the topic
+    mqtt_handler.subscribe(topic, email, device_name)
 
 def create_folder_and_file(data):
     email = data.get('data', {}).get('admin', '')
