@@ -1,0 +1,15 @@
+{
+    "dev_type": "custom",
+    "_id": "6532a9eb9606cb46cfbbdc8e",
+    "client_id": "VpJchv_AWixxQUJj7rugKm5abCsmg-DF4nqki0wQhW8",
+    "admin": "admin@laaltentech.com",
+    "client_secret": "HifAx9s8RzBDKuyu_82Xt4RrPw47YEZnfBfcz7kycCE",
+    "topic": "test/02",
+    "ping_speed": "3",
+    "device_name": "Dev 02",
+    "timestamp": "1697819115",
+    "interface": "{\"data\": \"test data\"}",
+    "collection_name": "Dev_02_1697819115588",
+    "__v": 0,
+    "connect_at": "57827"
+}
