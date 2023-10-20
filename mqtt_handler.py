@@ -1,12 +1,17 @@
 import json
 import paho.mqtt.client as mqtt
 import os
+import time
+import socketio
 
 class MQTTHandler:
-    def __init__(self, broker_address, port):
+    def __init__(self, broker_address, port, socketio_client):
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
+        self.sio = socketio_client
+
+        self.topic_map = {}
 
         # Connect to the MQTT broker immediately
         self.connect(broker_address, port)
@@ -19,7 +24,8 @@ class MQTTHandler:
 
     def on_message(self, client, userdata, msg):
         payload = msg.payload.decode('utf-8')
-        interface_file_path = self.get_interface_file_path(userdata)
+        topic_data = self.topic_map.get(msg.topic, {})
+        interface_file_path = self.get_interface_file_path(topic_data)
         print("path found was " + interface_file_path + " and payload is " + payload)
 
         if os.path.exists(interface_file_path):
@@ -31,9 +37,19 @@ class MQTTHandler:
                 
                 try:
                     parsed_data = json.loads(payload)
-                    for key in interface:
-                        if key not in parsed_data:
-                            print(f"Key {key} from interface not found in received data.")
+                    if all(key in parsed_data for key in interface):
+                        # All keys in interface are present in parsed_data
+                        event_data = {
+                            "_id": topic_data.get('device_id', ''),
+                            "timestamp": str(int(time.time())),  # assuming you want to send the current timestamp
+                            "interface": json.dumps(parsed_data),
+                            "collection_name": topic_data.get('collection_name', '')
+                        }
+                        self.sio.emit('device_data', event_data)
+                    else:
+                        for key in interface:
+                            if key not in parsed_data:
+                                print(f"Key {key} from interface not found in received data.")
                 except json.JSONDecodeError:
                     print("Received data is not valid JSON.")
         else:
@@ -55,11 +71,13 @@ class MQTTHandler:
         self.client.connect(broker_address, port)
         self.client.loop_start()
 
-    def subscribe(self, topic, email, device_name):
-        self.client.user_data_set({
+    def subscribe(self, topic, email, device_name, collection_name):
+        self.topic_map[topic] = {
             "email": email,
-            "device_name": device_name
-        })
+            "device_name": device_name,
+            "collection_name": collection_name
+        }
+        
         self.client.subscribe(topic)
     
     def unsubscribe(self, topic):
@@ -80,4 +98,7 @@ class MQTTHandler:
                             email = email_folder.replace('_', '@')
                             device_name = device_name_only.rsplit('.', 1)[0].replace('_', ' ')
                             print("trying to subscribe to  " + topic)
-                            self.subscribe(topic, email, device_name)
+                            collection_name = data.get("collection_name")
+                            collection_name = collection_name.lower()
+                            print("collection_name is " + collection_name)
+                            self.subscribe(topic, email, device_name, collection_name)

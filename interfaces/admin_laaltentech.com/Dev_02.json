@@ -1,15 +1,15 @@
 {
-    "dev_type": "custom",
-    "_id": "6532a9eb9606cb46cfbbdc8e",
-    "client_id": "VpJchv_AWixxQUJj7rugKm5abCsmg-DF4nqki0wQhW8",
+    "dev_type": "android",
+    "_id": "6532f127503eef831d2722c7",
+    "client_id": "Or3uHnmTUZMc32P6ADuqIfzTfYxLmm0vFFKKCL24Vfc",
     "admin": "admin@laaltentech.com",
-    "client_secret": "HifAx9s8RzBDKuyu_82Xt4RrPw47YEZnfBfcz7kycCE",
+    "client_secret": "LkthIaEM9jvQ7HKSTa_gyuQJwqN9-zAudhoEXp1hZJw",
     "topic": "test/02",
-    "ping_speed": "3",
+    "ping_speed": "4",
     "device_name": "Dev 02",
-    "timestamp": "1697819115",
-    "interface": "{\"data\": \"test data\"}",
-    "collection_name": "Dev_02_1697819115588",
+    "timestamp": "1697837351",
+    "interface": "{\"test\": \"data1\", \"test2\": \"data2\"}",
+    "collection_name": "Dev_02_1697837351735",
     "__v": 0,
     "connect_at": "57827"
 }

@@ -9,7 +9,7 @@ import json
 from mqtt_handler import MQTTHandler
 
 sio = socketio.Client()
-mqtt_handler = MQTTHandler("127.0.0.1", 1883)
+mqtt_handler = MQTTHandler("127.0.0.1", 1883, sio)
 
 @sio.on('connect')
 def on_connect():
