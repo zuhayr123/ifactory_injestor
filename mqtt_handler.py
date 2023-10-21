@@ -39,6 +39,7 @@ class MQTTHandler:
                     parsed_data = json.loads(payload)
                     if all(key in parsed_data for key in interface):
                         # All keys in interface are present in parsed_data
+                        parsed_data["timestamp"] = str(int(time.time()))
                         event_data = {
                             "_id": topic_data.get('device_id', ''),
                             "timestamp": str(int(time.time())),  # assuming you want to send the current timestamp

@@ -29,6 +29,7 @@ def on_create_device_interface(data):
     topic = data.get('data', {}).get('topic', '')
     email = data.get('data', {}).get('admin', '')
     device_name = data.get('data', {}).get('device_name', 'default_device')
+    collection_name = data.get('data', {}).get('collection_name')
 
     print("data found on broker address " + broker_address + "port is " + port + " topic is " + topic + " email id is " + email + " device name is " + device_name)
 
@@ -37,7 +38,7 @@ def on_create_device_interface(data):
         mqtt_handler.connect(broker_address, int(1883))
 
     # Subscribe to the topic
-    mqtt_handler.subscribe(topic, email, device_name)
+    mqtt_handler.subscribe(topic, email, device_name, collection_name)
 
 @sio.on('delete_device_interface')
 def on_create_device_interface(data):
