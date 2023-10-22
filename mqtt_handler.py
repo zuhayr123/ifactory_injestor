@@ -23,38 +23,55 @@ class MQTTHandler:
         print(f"Connected to MQTT with result code {str(rc)}")
 
     def on_message(self, client, userdata, msg):
-        payload = msg.payload.decode('utf-8')
-        topic_data = self.topic_map.get(msg.topic, {})
-        interface_file_path = self.get_interface_file_path(topic_data)
-        print("path found was " + interface_file_path + " and payload is " + payload)
-
-        if os.path.exists(interface_file_path):
-            with open(interface_file_path, 'r') as f:
-                data = json.load(f)
-                interface_str = data["interface"]
-                interface = json.loads(interface_str)  # convert the string representation to a dictionary
-                print("interface data is:", interface)
-                
-                try:
-                    parsed_data = json.loads(payload)
-                    if all(key in parsed_data for key in interface):
-                        # All keys in interface are present in parsed_data
-                        parsed_data["timestamp"] = str(int(time.time()))
-                        event_data = {
-                            "_id": topic_data.get('device_id', ''),
-                            "timestamp": str(int(time.time())),  # assuming you want to send the current timestamp
-                            "interface": json.dumps(parsed_data),
-                            "collection_name": topic_data.get('collection_name', '')
-                        }
-                        self.sio.emit('device_data', event_data)
-                    else:
-                        for key in interface:
-                            if key not in parsed_data:
-                                print(f"Key {key} from interface not found in received data.")
-                except json.JSONDecodeError:
-                    print("Received data is not valid JSON.")
+        if msg.topic.startswith("status/"):
+            device_id = msg.topic.split("/")[-1]
+            status = msg.payload.decode("utf-8")
+            print(f"Device {device_id} is {status}")
+            current_timestamp = int(time.time())
+            
+            # Emit the status on socketio
+            event_data = {
+                "device_id": device_id,
+                "status": status,
+                "timestamp": current_timestamp  # include timestamp in the emitted data
+            }
+            try:
+                self.sio.emit('device_status', event_data)
+            except socketio.exceptions.BadNamespaceError as e:
+                print("Error emitting event:")
         else:
-            print(f"No interface found for {userdata['device_name']}")
+            payload = msg.payload.decode('utf-8')
+            topic_data = self.topic_map.get(msg.topic, {})
+            interface_file_path = self.get_interface_file_path(topic_data)
+            print("path found was " + interface_file_path + " and payload is " + payload)
+
+            if os.path.exists(interface_file_path):
+                with open(interface_file_path, 'r') as f:
+                    data = json.load(f)
+                    interface_str = data["interface"]
+                    interface = json.loads(interface_str)  # convert the string representation to a dictionary
+                    print("interface data is:", interface)
+                    
+                    try:
+                        parsed_data = json.loads(payload)
+                        if all(key in parsed_data for key in interface):
+                            # All keys in interface are present in parsed_data
+                            parsed_data["timestamp"] = str(int(time.time()))
+                            event_data = {
+                                "_id": topic_data.get('device_id', ''),
+                                "timestamp": str(int(time.time())),  # assuming you want to send the current timestamp
+                                "interface": json.dumps(parsed_data),
+                                "collection_name": topic_data.get('collection_name', '')
+                            }
+                            self.sio.emit('device_data', event_data)
+                        else:
+                            for key in interface:
+                                if key not in parsed_data:
+                                    print(f"Key {key} from interface not found in received data.")
+                    except json.JSONDecodeError:
+                        print("Received data is not valid JSON.")
+            else:
+                print(f"No interface found for {userdata['device_name']}")
 
     def get_interface_file_path(self, data):
         email = data.get('email', '')
@@ -92,6 +109,8 @@ class MQTTHandler:
                     file_path = os.path.join(root, file_name)
                     with open(file_path, 'r') as f:
                         data = json.load(f)
+                        device_id = data["client_id"]
+                        status_topic = "status/" + device_id
                         topic = data.get("topic")
                         if topic:
                             # Extract email and device name from file path
@@ -103,3 +122,4 @@ class MQTTHandler:
                             collection_name = collection_name.lower()
                             print("collection_name is " + collection_name)
                             self.subscribe(topic, email, device_name, collection_name)
+                            self.client.subscribe(status_topic)
