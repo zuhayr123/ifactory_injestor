@@ -89,11 +89,14 @@ class MQTTHandler:
         self.client.connect(broker_address, port)
         self.client.loop_start()
 
-    def subscribe(self, topic, email, device_name, collection_name):
+    def subscribe(self, topic, email, device_name, collection_name, client_id):
+        status_topic = "status/" + client_id
+        self.client.subscribe(status_topic)
         self.topic_map[topic] = {
             "email": email,
             "device_name": device_name,
-            "collection_name": collection_name
+            "collection_name": collection_name,
+            "client_id": client_id
         }
         
         self.client.subscribe(topic)
@@ -110,7 +113,6 @@ class MQTTHandler:
                     with open(file_path, 'r') as f:
                         data = json.load(f)
                         device_id = data["client_id"]
-                        status_topic = "status/" + device_id
                         topic = data.get("topic")
                         if topic:
                             # Extract email and device name from file path
@@ -121,5 +123,5 @@ class MQTTHandler:
                             collection_name = data.get("collection_name")
                             collection_name = collection_name.lower()
                             print("collection_name is " + collection_name)
-                            self.subscribe(topic, email, device_name, collection_name)
-                            self.client.subscribe(status_topic)
+                            self.subscribe(topic, email, device_name, collection_name, device_id)
+                            # self.client.subscribe(status_topic)

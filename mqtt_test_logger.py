@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 
-device_id = "GWr_ejBDnlvKSHuVbzTVL2BIonRcllQd-vZS7k5kEwk"
+device_id = "jO3hRDJHeMzkSal4XoD6O_vvhCGpKQ1-i5RKOa6w4yI"
 # Define the LWT message
 LWT_TOPIC = "status/" + device_id
 LWT_PAYLOAD = "offline"
