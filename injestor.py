@@ -10,7 +10,7 @@ from mqtt_handler import MQTTHandler
 import time
 
 sio = socketio.Client()
-mqtt_handler = MQTTHandler("192.168.1.28", 1883, sio)
+mqtt_handler = MQTTHandler("localhost", 1883, sio)
 
 @sio.on('connect')
 def on_connect():
@@ -100,7 +100,7 @@ def main():
     # Loop for Socket.IO connection
     for attempt in range(max_retries):
         try:
-            sio.connect('http://localhost:3000/')
+            sio.connect('ws://ifactorybackend-env.eba-fagcpiid.us-west-2.elasticbeanstalk.com/')
             sio.wait()
             break  # exit the loop if connected successfully
         except Exception as e:

@@ -14,7 +14,7 @@ def on_connect(client, userdata, flags, rc):
 client = mqtt.Client(client_id=device_id)
 client.on_connect = on_connect  # Assign the on_connect callback function
 client.will_set(LWT_TOPIC, LWT_PAYLOAD, qos=1, retain=True)
-client.connect("192.168.1.28", 1883)
+client.connect("localhost", 1883)
 
 # Start the network loop
 client.loop_forever()
