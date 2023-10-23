@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 
-device_id = "j9dfQ9hwNQ1gTbtQNoMqIUnaCZZGiirekulieVN11vU"
+device_id = "v-Jy59qXEw4Gf_0BJKm9pFu93dJPlBczGaN2g-k3T80"
 # Define the LWT message
 LWT_TOPIC = "status/" + device_id
 LWT_PAYLOAD = "offline"
@@ -14,7 +14,7 @@ def on_connect(client, userdata, flags, rc):
 client = mqtt.Client(client_id=device_id)
 client.on_connect = on_connect  # Assign the on_connect callback function
 client.will_set(LWT_TOPIC, LWT_PAYLOAD, qos=1, retain=True)
-client.connect("127.0.0.1", 1883)
+client.connect("192.168.1.28", 1883)
 
 # Start the network loop
 client.loop_forever()

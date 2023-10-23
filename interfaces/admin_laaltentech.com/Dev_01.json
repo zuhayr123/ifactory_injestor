@@ -1,0 +1,15 @@
+{
+    "dev_type": "custom",
+    "_id": "6535578b00747a439cb9d82e",
+    "client_id": "v-Jy59qXEw4Gf_0BJKm9pFu93dJPlBczGaN2g-k3T80",
+    "admin": "admin@laaltentech.com",
+    "client_secret": "yXykp3msq6y2x---1MGDhSdC1uiebatUR2XwO3dZk6Q",
+    "topic": "test/01",
+    "ping_speed": "4",
+    "device_name": "Dev 01",
+    "timestamp": "1697994635",
+    "interface": "{\"tempearture\" : \"20\", \"pressure\": \"400\", \"voltage\": \"440\"}",
+    "collection_name": "Dev_01_1697994635061",
+    "__v": 0,
+    "connect_at": "57827"
+}

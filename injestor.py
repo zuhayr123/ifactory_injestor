@@ -7,9 +7,10 @@ import socketio
 import os
 import json
 from mqtt_handler import MQTTHandler
+import time
 
 sio = socketio.Client()
-mqtt_handler = MQTTHandler("127.0.0.1", 1883, sio)
+mqtt_handler = MQTTHandler("192.168.1.28", 1883, sio)
 
 @sio.on('connect')
 def on_connect():
@@ -93,11 +94,20 @@ def delete_device_file(email, device_name):
         print(f"{json_filename} not found.")
 
 def main():
-    try:
-        sio.connect('http://localhost:3000/')
-        sio.wait()
-    except Exception as e:
-        print("Error:", e)
+    max_retries = 12000 
+    retry_interval = 10  # in seconds, which is 5 minutes
+    
+    # Loop for Socket.IO connection
+    for attempt in range(max_retries):
+        try:
+            sio.connect('http://localhost:3000/')
+            sio.wait()
+            break  # exit the loop if connected successfully
+        except Exception as e:
+            print(f"Error connecting to Socket.IO server: {e}. Attempt {attempt + 1}/{max_retries}. Retrying in {retry_interval/60} minutes...")
+            time.sleep(retry_interval)
+    else:
+        print("Failed to connect to Socket.IO server after 10 hours. Exiting.")
 
 if __name__ == '__main__':
     main()

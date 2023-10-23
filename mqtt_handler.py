@@ -86,8 +86,21 @@ class MQTTHandler:
         return complete_path
 
     def connect(self, broker_address, port):
-        self.client.connect(broker_address, port)
-        self.client.loop_start()
+
+        max_retries = 12000  # 120 attempts * 5 minutes each = 10 hours
+        retry_interval = 10  # in seconds, which is 5 minutes
+        
+        # Loop for MQTT broker connection
+        for attempt in range(max_retries):
+            try:
+                self.client.connect(broker_address, port)
+                self.client.loop_start()
+                break  # exit the loop if connected successfully
+            except Exception as e:
+                print(f"Error connecting to MQTT broker: {e}. Attempt {attempt + 1}/{max_retries}. Retrying in {retry_interval/60} minutes...")
+                time.sleep(retry_interval)
+        else:
+            print("Failed to connect to MQTT broker after 10 hours. Exiting.")
 
     def subscribe(self, topic, email, device_name, collection_name, client_id):
         status_topic = "status/" + client_id
